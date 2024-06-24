@@ -111,3 +111,4 @@ C:\Users\felip\project\Projetinhos\Estoque\obj\Debug\net8.0\refint\Estoque.dll
 C:\Users\felip\project\Projetinhos\Estoque\obj\Debug\net8.0\Estoque.pdb
 C:\Users\felip\project\Projetinhos\Estoque\obj\Debug\net8.0\Estoque.genruntimeconfig.cache
 C:\Users\felip\project\Projetinhos\Estoque\obj\Debug\net8.0\ref\Estoque.dll
+C:\Users\felip\project\Projetinhos\Estoque\obj\Debug\net8.0\Estoque.sourcelink.json
