@@ -72,46 +72,46 @@ app.MapDelete("/produtos/{id}", async (int id, ProductService productService) =>
 
 
 //---------------------------------------------Cadastro usuarios --------------------------------------------------------
-//Cadastrar Produtos -------------------------------------------------------
-
-app.MapPost("/createUser" , async (EstoqueDbContext DbContext , User newUser)=>{
-    DbContext.Usuarios.Add(newUser);
-    await DbContext.SaveChangesAsync();
-    return Results.Created($"/createUser/{newUser.id}", newUser);
-    });
-
-     // Consultar dados do DB
- app.MapGet("/user", async (EstoqueDbContext DbContext) =>{
-    var User = await DbContext.Usuarios.ToListAsync();
-    return Results.Ok(User);
-
- });
-
-//Atualiza Produto Existente
-app.MapPut("/user/{id}", async (int id , EstoqueDbContext dbContext , User updatedUser)=>{
-
-    //verifica Produto existente na base , conforme o id informado
-    //se o produto existir na base , sera retornado  para dentro do objeto existingProduto
-
-    var existingUser = await dbContext.Usuarios.FindAsync(id);
-    if(existingUser is null){
-        return Results.NotFound($"User with ID {id} not found.");
-
-}
-
-existingUser.UserName = updatedUser.UserName;
-existingUser.email = updatedUser.email;
 
 
-//SALVA NO DB
-await dbContext.SaveChangesAsync();
-
-//retorna para o cliente que invocou o endpoint
-return Results.Ok(existingUser);
-
+app.MapGet("/user", async (UserService userService) =>
+{
+    var user = await userService.GetAllUserAsync();
+    return Results.Ok(user);
 });
 
+app.MapGet("/user/{id}", async (int id, UserService userService) =>
+{
+    var user = await userService.GetPUserByIdAsync(id);
+    if (user == null)
+    {
+        return Results.NotFound($"User with ID {id} not found.");
+    }
+    return Results.Ok(user);
+});
 
+app.MapPost("/user", async (User user, UserService GetPUserByIdAsync) =>
+{
+    await GetPUserByIdAsync.AddUserAsync(user);
+    return Results.Created($"/produtos/{user.id}", user);
+});
+
+app.MapPut("/user/{id}", async (int id, User user, UserService userService) =>
+{
+    if (id != user.id)  // Corrigido 'user.id' para 'user.Id' para seguir a convenção de PascalCase.
+    {
+        return Results.BadRequest("User ID mismatch.");
+    }
+
+    await userService.UpdateUserAsync(user);  // Chamando o método na instância de userService.
+    return Results.Ok();
+});
+
+app.MapDelete("/user/{id}", async (int id, UserService userService) =>
+{
+    await userService.DeleteUserAsync(id);
+    return Results.Ok();
+});
 
 
 app.Run();
