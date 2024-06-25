@@ -1,4 +1,5 @@
 using Estoque;
+using loja.services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Update.Internal;
@@ -13,47 +14,60 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<EstoqueDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 26))));
 
+//Cadastra os serviços ao conteiner
+
+builder.Services.AddScoped<ProductService>();
 
 var app = builder.Build();
 
 
-//Cadastrar Produtos -------------------------------------------------------
-
-app.MapPost("/createProduto" , async (EstoqueDbContext DbContext , Produto newProduto)=>{
-    DbContext.Produtos.Add(newProduto);
-    await DbContext.SaveChangesAsync();
-    return Results.Created($"/createProduto/{newProduto.Id}", newProduto);
-    });
-
-     // Consultar dados do DB
- app.MapGet("/produtos", async (EstoqueDbContext DbContext) =>{
-    var produtos = await DbContext.Produtos.ToListAsync();
-    return Results.Ok(produtos);
-
- });
-
-//Atualiza Produto Existente
-app.MapPut("/Produto/{id}", async (int id , EstoqueDbContext dbContext , Produto updatedProduto)=>{
-
-    //verifica Produto existente na base , conforme o id informado
-    //se o produto existir na base , sera retornado  para dentro do objeto existingProduto
-
-    var existingProduto = await dbContext.Produtos.FindAsync(id);
-    if(existingProduto is null){
-        return Results.NotFound($"Produto with ID {id} not found.");
-
+// Configuração das requisições HTTP
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
 }
 
-existingProduto.Nome = updatedProduto.Nome;
-existingProduto.Preco = updatedProduto.Preco;
-existingProduto.fornecedor = updatedProduto.fornecedor;
 
-//SALVA NO DB
-await dbContext.SaveChangesAsync();
+                                   
+//Cadastrar Produtos ------------------UTILIZANDO SERVICE-------------------------------------
 
-//retorna para o cliente que invocou o endpoint
-return Results.Ok(existingProduto);
+app.MapGet("/produtos", async (ProductService productService) =>
+{
+    var produtos = await productService.GetAllProductsAsync();
+    return Results.Ok(produtos);
+});
 
+app.MapGet("/produtos/{id}", async (int id, ProductService productService) =>
+{
+    var produto = await productService.GetProductByIdAsync(id);
+    if (produto == null)
+    {
+        return Results.NotFound($"Product with ID {id} not found.");
+    }
+    return Results.Ok(produto);
+});
+
+app.MapPost("/produtos", async (Produto produto, ProductService productService) =>
+{
+    await productService.AddProductAsync(produto);
+    return Results.Created($"/produtos/{produto.Id}", produto);
+});
+
+app.MapPut("/produtos/{id}", async (int id, Produto produto, ProductService productService) =>
+{
+    if (id != produto.Id)
+    {
+        return Results.BadRequest("Product ID mismatch.");
+    }
+
+    await productService.UpdateProductAsync(produto);
+    return Results.Ok();
+});
+
+app.MapDelete("/produtos/{id}", async (int id, ProductService productService) =>
+{
+    await productService.DeleteProductAsync(id);
+    return Results.Ok();
 });
 
 
