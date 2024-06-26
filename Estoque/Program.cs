@@ -112,6 +112,20 @@ app.MapDelete("/user/{id}", async (int id, UserService userService) =>
     await userService.DeleteUserAsync(id);
     return Results.Ok();
 });
+ //------------------------Endpoint estoque--------------------------------------------
+
+ app.MapPost("/produtos/{id}/mover-para-estoque", async (int id, int quantidade, EstoqueService estoqueService) =>
+{
+    try
+    {
+        await estoqueService.MoverProdutoParaEstoqueAsync(id, quantidade);
+        return Results.Ok();
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
+});
 
 
 app.Run();

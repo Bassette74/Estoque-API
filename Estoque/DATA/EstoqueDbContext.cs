@@ -7,4 +7,5 @@ public class EstoqueDbContext : DbContext
 
     public DbSet<Produto> Produtos { get; set; }
     public DbSet<User> Usuarios {get;set;}
+    public DbSet<Estoques> Estoquess {get; set;}
 }

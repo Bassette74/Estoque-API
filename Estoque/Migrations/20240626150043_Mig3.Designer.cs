@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Estoque.Migrations
 {
     [DbContext(typeof(EstoqueDbContext))]
-    partial class EstoqueDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240626150043_Mig3")]
+    partial class Mig3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,9 +62,6 @@ namespace Estoque.Migrations
 
                     b.Property<decimal>("Preco")
                         .HasColumnType("decimal(65,30)");
-
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("int");
 
                     b.Property<string>("TipoProduto")
                         .IsRequired()
